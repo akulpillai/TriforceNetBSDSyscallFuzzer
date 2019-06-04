@@ -1,0 +1,52 @@
+#!/bin/sh
+
+AFL=${TAFL:-../../TriforceAFL}
+IMG=disk.bin
+KERN=kernel
+
+# you need a GDB that can deal with "kernel" properly
+# configure GDB with "./configure --target=x86_64-netbsd"
+GDB=x86_64-netbsd-gdb
+
+if [ ! -x "`which $GDB`" ] ; then
+    echo "You need a GDB!  I cant find $GDB"
+    exit 1
+fi
+
+# hokey arg parsing, sorry!
+if [ "x$1" = "x-C" ] ; then # continue
+    INP="-"
+    shift
+else
+    INP=inputs
+fi
+
+if [ "x$1" = "x-M" -o "x$1" = "x-S" ] ; then # master/slave args
+    FARGS="$1 $2"
+    shift; shift
+else
+    echo "specify -M n  or -S n  please"
+    exit 1
+fi
+
+getSym() {
+    name=$1
+    $GDB -batch -ex "p/x &$name" $KERN 2>/dev/null |sed 's/^.*0x//g'
+}
+
+PANIC=`getSym panic`
+LOGSTORE=0   #XXX for now
+
+#test -d inputs || mkdir inputs
+#test -f inputs/ex1 || ./gen.py
+
+# run fuzzer and qemu-system
+export AFL_SKIP_CRASHES=1
+$AFL/afl-fuzz $FARGS -t 500+ -m 3000 -i $INP -o outputs -QQ -- \
+    $AFL/afl-qemu-system-trace \
+    -L $AFL/qemu_mode/qemu/pc-bios \
+    -m 128M -nographic -drive format=raw,file=privmem:${IMG} \
+    -aflPanicAddr "$PANIC" \
+    -aflDmesgAddr "$LOGSTORE" \
+    -aflFile @@
+
