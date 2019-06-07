@@ -1,0 +1,7 @@
+# XXX XXX XXX not yet updated for netbsd XXX XXX XXX
+TESTME 1 exit 0
+2 fork
+3 read fd buf sz
+4 write fd str sz
+5 open fn 0 0666
+6 close fd
