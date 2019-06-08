@@ -82,7 +82,18 @@ and unpack the inputs into the fuzzHost directory:
     cp disk* fuzzHost/
     cp bsd* fuzzHost/
     cd fuzzhost
+    make
     tar xzf ../inputs.tgz
+```
+
+on your host machine, you'll need to build gdb for netbsd and put it in
+your path as x86_64-netbsd-gdb
+```
+   tar -xzf gdb-source
+   cd gdb-source
+   ./configure --target=x86_64-netbsd --prefix=/some/dir
+   make
+   make install
 ```
 
 Start fuzzing using `runFuzz`
