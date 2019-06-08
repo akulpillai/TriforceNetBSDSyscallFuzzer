@@ -1,4 +1,9 @@
-# Building the target files
+# TriforceNetBSDSyscallFuzzer
+TriforceAFL is a modified version of AFL that supports fuzzing 
+using QEMU's full system emulation. TriforceNetBSDSyscallFuzzer 
+will be a syscall fuzzer for NetBSD built on top of TriforceAFL.
+
+## Building the target 
 On the NetBSD box , enter the `targ` directory and run `make`.
 You should also build input files from this directory
 ```
@@ -8,7 +13,7 @@ You should also build input files from this directory
     tar -czf ../inputs.tgz inputs
 ```
 
-# Building a test image
+## Building a test image
 To build a test image, begin by performing a install of the 
 operating system using qemu. We start by making a disk 
 image in qemu and installing NetBSD on it. We will do the 
@@ -65,7 +70,7 @@ The fuzzHost/runFuzz attaches the disk.bin as our primary drive and boots
 from it.  It then uses testAfl to run through the inputs
 from `inputs/ex?`.
 
-# Preparing the Host and Fuzzing
+## Preparing the Host and Fuzzing
 We run the fuzzer on a Linux host (it should work on any host
 where TriforceAFL builds and runs, but YMMV, especially on a non-linux host).
 On the fuzzer host, install TriforceAFL to ../TriforceAFL.
