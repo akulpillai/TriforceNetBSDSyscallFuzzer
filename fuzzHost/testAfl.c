@@ -11,13 +11,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <signal.h>
 #include <sys/time.h>
 #include <unistd.h>
 #include <sys/wait.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
 
-#include "../../TriforceAFL/config.h"
+#include "/usr/pkg/triforceafl/config.h"
 
 #define FUZZFN ".fuzzdat"
 

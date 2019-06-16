@@ -1,17 +1,14 @@
 #!/bin/sh
 
-AFL=${TAFL:-../../TriforceAFL}
+AFL=${TAFL:-/usr/pkg/triforceafl/bin}
 IMG=disk.bin
-KERN=kernel
+KERN=netbsd
+export AFL_PATH=
 
-# you need a GDB that can deal with "kernel" properly
-# configure GDB with "./configure --target=x86_64-netbsd"
-GDB=x86_64-netbsd-gdb
-
-if [ ! -x "`which $GDB`" ] ; then
-    echo "You need a GDB!  I cant find $GDB"
-    exit 1
-fi
+#if [ ! -x "`which $GDB`" ] ; then
+#    echo "You need a GDB!  I cant find $GDB"
+#    exit 1
+#fi
 
 # hokey arg parsing, sorry!
 if [ "x$1" = "x-C" ] ; then # continue
@@ -31,10 +28,10 @@ fi
 
 getSym() {
     name=$1
-    $GDB -batch -ex "p/x &$name" $KERN 2>/dev/null |sed 's/^.*0x//g'
+    nm $KERN | grep -w $name | cut -d ' ' -f1
 }
 
-PANIC=`getSym panic`
+PANIC=0x`getSym panic`
 LOGSTORE=0   #XXX for now
 
 #test -d inputs || mkdir inputs
