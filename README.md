@@ -10,7 +10,6 @@ You should also build input files from this directory
     mkdir inputs
     ./gen.py                   # build simple tests
     ./genTempl.py templ.txt    # build most syscall tests
-    tar -czf ../inputs.tgz inputs
 ```
 
 ## Building a test image
@@ -71,29 +70,17 @@ from it.  It then uses testAfl to run through the inputs
 from `inputs/ex?`.
 
 ## Preparing the Host and Fuzzing
-We run the fuzzer on a Linux host (it should work on any host
-where TriforceAFL builds and runs, but YMMV, especially on a non-linux host).
-On the fuzzer host, install TriforceAFL to ../TriforceAFL.
-Copy the `disk*.bin` and `bsd*.gdb` to the `fuzzhost` directory, 
-and unpack the inputs into the fuzzHost directory:
+We run the fuzzer on a NetBSD host.
+On the fuzzer host, install TriforceAFL from pkgsrc(wip/triforceafl).
+Copy the `disk*.bin` and kernel image `netbsd` to the `fuzzhost` directory, 
+and move the inputs into the fuzzHost directory:
 
 ```
-    cd TriforceNetBSDFuzzer # this should now have the files we made on the BSD host in it
-    cp disk* fuzzHost/
-    cp bsd* fuzzHost/
+    cd TriforceNetBSDSyscallFuzzer # this should now have the files disk.bin and kernel
+    cp disk.bin fuzzHost/
+    cp netbsd fuzzHost/
     cd fuzzhost
     make
-    tar xzf ../inputs.tgz
+    mv ../targ/inputs .
 ```
-
-on your host machine, you'll need to build gdb for netbsd and put it in
-your path as x86_64-netbsd-gdb
-```
-   tar -xzf gdb-source
-   cd gdb-source
-   ./configure --target=x86_64-netbsd --prefix=/some/dir
-   make
-   make install
-```
-
-Start fuzzing using `runFuzz`
+Start fuzzing using `./runFuzz -M -M0`
