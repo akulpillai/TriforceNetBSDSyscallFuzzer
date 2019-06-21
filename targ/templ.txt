@@ -1,5 +1,5 @@
 # XXX XXX XXX not yet updated for netbsd XXX XXX XXX
-1 exit 0
+TESTME 1 exit 0
 2 fork
 3 read fd buf sz
 4 write fd str sz
@@ -25,7 +25,7 @@ TESTME 23 setuid 1
 24 getuid
 25 geteuid
 # note: 10 = PT_ATTACH
-26 ptrace 10 pid str 0
+TESTME 26 ptrace 10 pid str 0
 # 27 recvmsg - TODO: separate fuzzer?
 # 28 sendmsg - TODO: separate fuzzer?
 # 29 recvfrom - gen2
@@ -124,7 +124,7 @@ TESTME 161 compat_30_getfh fn buf
 # XXX 162 compat_09_ogetdomainname
 # XXX 163 compat_09_osetdomainname
 # XXX 164 compat_09_uname
-165 sysarch 11 str
+TESTME 165 sysarch 11 str
 # XXX 169 compat_10_semsys
 # XXX 170 compat_10_omsgsys
 # XXX 171 compat_10_oshmsys
@@ -200,7 +200,7 @@ TESTME 275 lchown fn 1 2
 # 298 compat_30_fhopen - gen2
 # 299 compat_30_fhstat - gen2
 286 getsid pid
-334 compat_60_sa_yield
+# XXX 334 compat_60_sa_yield
 242 mlockall 1
 243 munlockall
 296 __getcwd buf sz
@@ -212,7 +212,7 @@ TESTME 275 lchown fn 1 2
 # 340 sigprocmask - gen2
 # 341 sigsuspend - gen2
 # struct sigaction=[funcptr,mask,flags]
-46 compat_13_sigaction13 15 [0,1,1] buf
+# XXX 46 compat_13_sigaction13 15 [0,1,1] buf
 # 344 sigreturn - gen2
 # XXX 345 sigtimedwait
 # XXX 346 sigwaitinfo
@@ -323,7 +323,7 @@ TESTME 275 lchown fn 1 2
 173 pread fd buf sz 123
 174 pwrite fd str sz 123
 # note: mmap has padding before off_t
-197 mmap 0 4096 7 0 fd 0 0
+TESTME 197 mmap 0 4096 7 0 fd 0 0
 # note: lseek has padding before off_t
 # XXX 481 thr_kill2
 # XXX 482 shm_open
