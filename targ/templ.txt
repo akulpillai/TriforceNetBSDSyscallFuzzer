@@ -1,7 +1,390 @@
 # XXX XXX XXX not yet updated for netbsd XXX XXX XXX
-TESTME 1 exit 0
+1 exit 0
 2 fork
 3 read fd buf sz
 4 write fd str sz
 5 open fn 0 0666
 6 close fd
+7 compat_50_wait4 pid buf 0 buf
+# XXX 8 compat_43_ocreat fn fd
+9 link fn fn
+10 unlink fn
+12 chdir fn
+13 fchdir fd
+TESTME 14 compat_50_mknod fn 0060666 0x102
+15 chmod fn 0666
+TESTME 16 chown fn 1 1
+# ASLR messes this one up, but with the right arg it works
+SKIP 17 break 0xc685c101380
+# XXX 18 compat_20_getfsstat
+# XXX 19 compat_43_olseek
+20 getpid
+# 21 mount - gen2
+TESTME 22 unmount fn 0
+TESTME 23 setuid 1
+24 getuid
+25 geteuid
+# note: 10 = PT_ATTACH
+26 ptrace 10 pid str 0
+# 27 recvmsg - TODO: separate fuzzer?
+# 28 sendmsg - TODO: separate fuzzer?
+# 29 recvfrom - gen2
+# 30 accept - gen2
+# 31 getpeername - gen2
+# 32 getsockname - gen2
+33 access fn 4
+34 chflags fn 1
+35 fchflags fd 1
+36 sync
+TESTME 37 kill pid 2
+# XXX 38 compat_43_stat43
+39 getppid
+41 dup fd
+42 pipe buf
+43 getegid
+44 profil buf sz 0 1
+45 ktrace fn 0 1 pid
+47 getgid
+# XXX 48 compat 13 sigprocmask13
+49 __getlogin buf sz
+TESTME 50 __setlogin "test"
+TESTME 51 acct {0;fn}
+# 53 sigaltstack - gen2
+# 54 ioctl - TODO specialized fuzzer?
+TESTME 55 compat_12_oreboot 0
+TESTME 56 revoke fn
+57 symlink fn fn
+TESTME 58 readlink fn  buf sz
+TESTME 59 execve fn ["foo","bar"] ["FOO=1","BAR=2"]
+60 umask 0022
+TESTME 61 chroot fn
+# XXX 62 compat_43_fstat43
+# XXX 63 compat_43_ogetkerninfo
+# XXX 64 compat_43_ogetpagesize
+# 65 msync - gen2
+66 vfork
+# XXX 69 sbrk
+# XXX 70 sstk
+# XXX 72 compat_43_ommap
+# XXX 72 vadvise
+73 munmap buf sz
+# 74 mprotect - gen2
+# 75 madvise - gen2
+# due to ASLR this one usually returns errors, but can work with right args.
+TESTME 78 mincore 0x2000 1 buf
+79 getgroups 10 buf
+TESTME 80 setgroups 3 [1,2,3]
+81 getpgrp
+82 setpgid pid pid
+83 compat_50_setitimer 0 [1,0,1,0]
+# XXX 84 compat_43_owait
+# XXX 85 compat_12_oswapon
+86 compat_50_getitimer 0 buf
+# XXX 87 compat_43_ogethostname
+89 compat_43_getdtablesize
+90 dup2 fd 4
+# 92 fcntl - gen2
+# 93 compat_50_select - gen2
+95 fsync fd
+96 setpriority 0 pid
+97 compat_30_socket 1 1 0
+# 98 connect - gen2
+# XXX 99 compat_43_oaccept
+100 getpriority 0 pid
+# XXX 101 compat_43_osend
+# XXX 102 compat_43_orecv
+# XXX 103 compat_13_sigreturn13
+# 104 bind - gen2
+# 105 setsockopt - gen2
+106 listen fd 5
+# XXX redacted
+116 compat_50_gettimeofday buf buf
+117 compat_50_getrusage 0 buf
+# 118 getsockopt - gen2
+120 readv fd [buf,sz,buf,sz] 2
+121 writev fd [str,sz,str,sz] 2
+TESTME 122 compat_50_settimeofday [1600000000,0] 32[600,0]
+TESTME 123 fchown fd 1 1
+124 fchmod fd 0666
+TESTME 126 setreuid 1 2
+TESTME 127 setregid 1 2
+128 rename fn fn
+131 flock fd 1
+132 mkfifo fn 0666
+# 133 sendto - gen2
+134 shutdown fd 1
+135 socketpair 1 1 0 buf
+136 mkdir fn 0666
+TESTME 137 rmdir fn
+TESTME 140 compat_50_adjtime [1,0] buf
+147 setsid
+# 148 compat_50_quotactl - SKIP for now, UFS only anyway, and we're not using UFS
+# 155 nfssvc
+TESTME 161 compat_30_getfh fn buf
+# XXX 162 compat_09_ogetdomainname
+# XXX 163 compat_09_osetdomainname
+# XXX 164 compat_09_uname
+165 sysarch 11 str
+# XXX 169 compat_10_semsys
+# XXX 170 compat_10_omsgsys
+# XXX 171 compat_10_oshmsys
+# XXX 175 compat_30_ntp_gettime
+# XXX 176 ntp_adjtime
+TESTME 181 setgid 1
+TESTME 182 setegid 1
+TESTME 183 seteuid 1
+# XXX 188 compat_12_stat12 fn buf
+# XXX 189 compat_12_fstat12 fd buf
+# XXX 190 compat_12_lstat12 fn buf
+191 pathconf fn 1
+192 fpathconf fd 1
+# XXX 193 getsocketopt2
+194 getrlimit 0 buf
+195 setrlimit 0 [1000,1000]
+# XXX 196 compat_12_getdirentries
+# 198 __syscall - skip
+# note: lseek has padding before off_t
+199 lseek fd 0 123 1
+200 truncate fn 123
+201 ftruncate fd 123
+# 202 __sysctl - gen2
+# 203 mlock - gen2
+# 204 munlock - gen2
+# XXX 205 undelete
+206 compat_50_futimes fd {0;[1600000000,0,1600000000,0]}
+207 getpgid pid
+# XXX redacted
+# 220 compat_14___semctl - gen2
+# 221 semget - gen2
+# 222 semop - gen2
+# 224 compat_14__msgctl
+# 225 msgget
+# 226 msgsnd
+# 227 msgrcv
+# 228 shmat
+# 229 compat_14_shmctl
+# 230 shmdt
+231 shmget 0 4096 01000
+232 compat_50_clock_gettime 0 buf
+TESTME 233 compat_50_clock_settime 0 [1600000000,0]
+234 compat_50_clock_getres 0 buf
+# XXX 235 timer_create
+# XXX 236 timer_delete
+# XXX 237 compat_50_timer_settime
+# XXX 238 compat_50_timer_gettime
+# XXX 239 timer_getoverrun
+240 nanosleep [1,0] buf
+# XXX 241 fdatasync
+# XXX 242 mlockall
+# XXX 243 munlockallmunlockall
+# XXX 247 _ksem_init
+# XXX 248 _ksem_open
+# XXX 250 _ksem_close
+# XXX 251 _ksem_post
+# XXX 252 _ksem_wait
+305 issetugid
+# XXX 402 aio_read
+# XXX 405 aio_write
+# XXX 406 lio_listio
+272 compat_30_getdents fd buf sz
+# XXX 274 lchmod
+TESTME 275 lchown fn 1 2
+# XXX 276 compat_50_lutimes
+# 277 __msync13 - gen2
+# XXX 278 compat_30___stat13
+# XXX 279 compat_30___fstat13
+# XXX 280 compat_30___lstat13
+289 preadv fd [buf,sz,buf,sz] 2 123
+290 pwritev fd [str,sz,str,sz] 2 123
+# 297 fchroot
+# 298 compat_30_fhopen - gen2
+# 299 compat_30_fhstat - gen2
+286 getsid pid
+334 compat_60_sa_yield
+242 mlockall 1
+243 munlockall
+296 __getcwd buf sz
+# XXX 346 sched_setparam
+# XXX 347 sched_getparam
+# XXX 350 sched_yield
+306 utrace str str sz
+# XXX 339 nnpfs_syscall
+# 340 sigprocmask - gen2
+# 341 sigsuspend - gen2
+# struct sigaction=[funcptr,mask,flags]
+46 compat_13_sigaction13 15 [0,1,1] buf
+# 344 sigreturn - gen2
+# XXX 345 sigtimedwait
+# XXX 346 sigwaitinfo
+# XXX 347 __acl_get_file
+# XXX 348 __acl_set_file
+# XXX 349 __acl_get_fd
+# XXX 350 __acl_set_fd
+# XXX 351 __acl_delete_file
+# XXX 352 __acl_delete_fd
+# XXX 353 __acl_aclcheck_file
+# XXX 354 __acl_aclcheck_fd
+# XXX 355 extattrctl
+# XXX 356 extattr_set_file
+# XXX 357 extattr_get_file
+# XXX 358 extattr_delete_file
+# XXX 359 aio_waitcomplete
+344 kqueue
+# 363 kevent - gen2
+# XXX 371 extattr_set_fd
+# XXX 372 extattr_get_fd
+# XXX 373 extattr_delete_fd
+# XXX 374 __setugid
+# XXX 376 eaccess
+# XXX 377 afs3_syscall
+# XXX 378 nmount
+# XXX 384 __mac_get_proc
+# XXX 385 __mac_set_proc
+# XXX 386 __mac_get_fd
+# XXX 387 __mac_get_file
+# XXX 388 __mac_set_fd
+# XXX 389 __mac_set_file
+# XXX 390 kenv
+# XXX 391 lchflags
+# XXX 392 uuidgen
+# XXX 393 sendfile
+# XXX 394 mac_syscall
+157 compat_20_statfs fn buf
+158 compat_20_fstatfs fd buf
+# 398 fhstatfs - gen2
+# XXX 400 ksem_close
+# XXX 401 ksem_post
+# XXX 402 ksem_wait
+# XXX 403 ksem_trywait
+# XXX 404 ksem_init
+# XXX 405 ksem_open
+# XXX 406 ksem_unlink
+# XXX 407 ksem_getvalue
+# XXX 408 ksem_destroy
+# XXX 409 __mac_get_pid
+# XXX 410 __mac_get_link
+# XXX 411 __mac_set_link
+# XXX 412 extattr_set_link
+# XXX 413 extattr_get_link
+# XXX 414 extattr_delete_link
+# XXX 415 __mac_execve
+# struct sigaction=[funcptr,mask,flags]
+416 sigaction 15 [0,1,1] buf
+# 417 sigreturn - gen2
+# XXX 421 getcontext
+# XXX 422 setcontext
+# XXX 423 swapcontext
+# XXX 424 swapoff
+# XXX 425 __acl_get_link
+# XXX 426 __acl_set_link
+# XXX 427 __acl_delete_link
+# XXX 428 __acl_aclcheck_link
+# XXX 429 sigwait
+# XXX 430 thr_create
+# XXX 431 thr_exit
+# XXX 432 thr_self
+# XXX 433 thr_kill
+# XXX 434 _umtx_lock
+# XXX 435 _umtx_unlock
+# XXX 436 jail_attach
+# XXX 437 extattr_list_fd
+# XXX 438 extattr_list_file
+# XXX 439 extattr_list_link
+# XXX 441 ksem_timedwait
+# XXX 442 thr_suspend
+# XXX 443 thr_wake
+# XXX 444 kldunloadf
+# XXX 445 audit
+# XXX 446 auditon
+# XXX 447 getauid
+# XXX 448 setauid
+# XXX 449 getaudit
+# XXX 450 setaudit
+# XXX 451 getaudit_addr
+# XXX 452 setaudit_addr
+# XXX 453 auditctl
+# XXX 454 _umtx_op
+# XXX 455 thr_new
+# XXX 456 sigqueue
+# XXX 457 kmq_open
+# XXX 458 kmq_setattr
+# XXX 459 kmq_timedreceive
+# XXX 460 kmq_timedsend
+# XXX 461 kmq_notify
+# XXX 462 kmq_unlink
+# XXX 463 abort2
+# XXX 464 thr_set_name
+# XXX 465 aio_fsync
+# XXX 466 rtprio_thread
+# XXX 471 sctp_peeloff
+# XXX 472 sctp_generic_sendmsg
+# XXX 473 sctp_generic_sendmsg_iov
+# XXX 474 sctp_generic_recvmsg
+173 pread fd buf sz 123
+174 pwrite fd str sz 123
+# note: mmap has padding before off_t
+197 mmap 0 4096 7 0 fd 0 0
+# note: lseek has padding before off_t
+# XXX 481 thr_kill2
+# XXX 482 shm_open
+# XXX 483 shm_unlink
+# XXX 484 cpuset
+# XXX 485 cpuset_setid
+# XXX 486 cpuset_getid
+# XXX 487 cpuset_getaffinity
+# XXX 488 cpuset_setaffinity
+462 faccessat fd fn 4 0
+463 fchmodat fd fn 0666 0
+TESTME 464 fchownat fd fn 1 2 2
+# XXX 465 fexecve
+# XXX 466 fstatat
+# XXX 494 futimesat
+# XXX 495 linkat fd fn fd fn 0
+461 mkdirat fd fn 0666
+459 mkfifoat fd fn 0666
+TESTME 460 mknodat fd fn 060666 0x102
+468 openat fd fn 0 0666
+TESTME 469 readlinkat fd fn buf sz
+458 renameat fd fn fd fn
+470 symlinkat fn fd fn
+471 unlinkat fd fn 0
+# XXX 504 posix_openpt
+# XXX 505 gssd_syscall
+# XXX 506 jail_get
+# XXX 507 jail_set
+# XXX 508 jail_remove
+# 510 semctl - gen2
+# XXX 511 msgctl
+# XXX 512 shmctl
+# XXX 513 lpathconf
+# XXX 515 __cap_rights_get
+# XXX 516 cap_enter
+# XXX 517 cap_getmode
+# XXX 518 pdfork
+# XXX 519 pdkill
+# XXX 520 pdgetpid
+# 522 pselect - gen2
+# XXX 523 getloginclass
+# XXX 524 setloginclass
+# XXX 525 rctl_get_racct
+# XXX 526 rctl_get_rules
+# XXX 527 rctl_get_limits
+# XXX 528 rctl_add_rule
+# XXX 529 rctl_remove_rule
+# XXX 530 posix_fallocate
+# XXX 531 posix_fadvise
+# XXX 532 wait6
+# XXX 533 cap_rights_limit
+# XXX 534 cap_ioctls_limit
+# XXX 535 cap_ioctls_get
+# XXX 536 cap_fcntls_limit
+# XXX 537 cap_fcntls_get
+# XXX 538 bindat
+# XXX 539 connectat
+# 541 accept4 - gen2
+453 pipe2 buf 0
+# XXX 543 aio_mlock
+# XXX 544 procctl
+# 545 ppoll - gen2
+# XXX 546 futimens
+467 utimensat fd fn {0;[1600000000,0,1600000000,0]} 0
