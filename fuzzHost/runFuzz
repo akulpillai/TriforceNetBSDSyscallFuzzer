@@ -2,7 +2,7 @@
 
 AFL=${TAFL:-/usr/pkg/triforceafl/bin}
 IMG=disk.bin
-KERN=netbsd
+KERN=netbsd.gdb
 export AFL_PATH=
 
 #if [ ! -x "`which $GDB`" ] ; then

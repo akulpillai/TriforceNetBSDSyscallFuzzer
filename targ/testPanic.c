@@ -14,8 +14,7 @@
 
 static void doPanic()
 {
-    /* for freebsd */
-    system("/sbin/sysctl debug.kdb.panic=1");
+    panic("PANIC!!");
 }
 
 int

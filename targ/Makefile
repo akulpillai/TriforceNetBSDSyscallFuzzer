@@ -1,6 +1,6 @@
 CFLAGS= -g -Wall
 
-# driver builds on freebsd
+# driver builds on netbsd
 all : driver 
 
 OBJS= aflCall.o driver.o parse.o sysc.o argfd.o

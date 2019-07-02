@@ -50,6 +50,8 @@ echo warm JIT cache
 
 echo start testing
 /bin/driver -v
+#/bin/testPrivmem
+#/bin/testPanic
 #/bin/sh -i
 
 echo "exiting"
@@ -72,13 +74,13 @@ from `inputs/ex?`.
 ## Preparing the Host and Fuzzing
 We run the fuzzer on a NetBSD host.
 On the fuzzer host, install TriforceAFL from pkgsrc(wip/triforceafl).
-Copy the `disk*.bin` and kernel image `netbsd` to the `fuzzhost` directory, 
+Copy the `disk*.bin` and kernel image / debugging symbols `netbsd.gdb` to the `fuzzhost` directory, 
 and move the inputs into the fuzzHost directory:
 
 ```
-    cd TriforceNetBSDSyscallFuzzer # this should now have the files disk.bin and kernel
+    cd TriforceNetBSDSyscallFuzzer # this should now have the files disk.bin and netbsd.gdb
     cp disk.bin fuzzHost/
-    cp netbsd fuzzHost/
+    cp netbsd.gdb fuzzHost/
     cd fuzzhost
     make
     mv ../targ/inputs .

@@ -1,16 +1,17 @@
 #!/bin/sh
 
-AFL=${TAFL:-../../TriforceAFL}
+AFL=${TAFL:-/usr/pkg/triforceafl/bin}
 IMG=disk.bin
-KERN=kernel
+KERN=netbsd.gdb
+export AFL_PATH=
 
 getSym() {
     name=$1
-    gdb -batch -ex "p/x &$name" $KERN 2>/dev/null |sed 's/^.*0x/ffffffff/g' 
+    nm $KERN | grep -w $name | cut -d ' ' -f1
 }
 
 # this function happens after printing the panic message and backtrace
-PANIC=`getSym kern_reboot`
+PANIC=`getSym panic`
 LOGSTORE=0   #XXX for now
 
 #test -d inputs || mkdir inputs
