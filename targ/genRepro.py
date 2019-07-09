@@ -5,6 +5,9 @@ Generate C reproducers for crashes
 
 import subprocess, glob, re
 
+class SysNotFoundError(Exception):
+    pass
+
 def gen_C(sys_l, f_id, crash_no):
     tmpl = '''
 // %s
@@ -28,10 +31,12 @@ def get_syscall_details(syscall_no) :
                 return (len(l.split()) - 3, l.split()[2])
             else : 
                 return (len(l.split()) - 2, l.split()[1])
+    else :
+        raise SysNotFoundError("Syscall not found :" + syscall_no)
 
 def gen_syscall_stat(sys) :
     sys = sys.split()
-    syscall_no = sys[1]
+    syscall_no = int(sys[1]) & 0x1ff
     no_args, syscall_name = get_syscall_details(syscall_no)
     args = []
     for i in sys[2:2+no_args]:
@@ -46,6 +51,9 @@ for l in glob.glob("../fuzzHost/outputs/*/crashes/id*") :
     sys_l = []
     for s in o :
         if re.search('syscall [0-9]+',s) :
-           sys_l.append(gen_syscall_stat(s))
+            try:
+                sys_l.append(gen_syscall_stat(s))
+            except SysNotFoundError as e:
+                print e.message
     gen_C(sys_l, l.split("/")[-1], crash_no)
     crash_no = crash_no + 1
