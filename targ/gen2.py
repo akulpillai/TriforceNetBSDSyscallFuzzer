@@ -145,3 +145,108 @@ mk('093_compat_50_select',
 compat_50_pselect = 373
 mk('373_compat_50_pselect',
     (compat_50_pselect, 3, bit0, bitNone, bitNone, time_1sec, intptr(1)))
+
+compat_50_kevent = 345
+kq = StdFile(38)
+ev_add = 1
+ev_disable = 8
+evfilter_read = 0xffff
+stdin = 0
+changes = Vec64(
+    # changes[0]
+    stdin,
+    evfilter_read | (ev_add << 16) | (0 << 32),
+    0,
+    Alloc(5),
+
+    # changes[1]
+    File("stuff here"),
+    evfilter_read | ((ev_add | ev_disable) << 16) | (0 << 32),
+    0,
+    0x12345
+    )
+events = Alloc(5 * 32)
+mk('345_compat_50_kevent',
+    (compat_50_kevent, kq, changes, 2, events, 5, time_1sec))
+mk('345_compat_50_kevent',
+    (compat_50_kevent, kq, 0, 0, events, 5, time_1sec))
+
+fcntl = 92
+f_dupfd = 0
+f_setown = 6
+f_setlk = 8
+filefd = File("stuff here")
+flock = Vec32(
+    0,0,   # u64 start
+    0,0,   # u64 len
+    ChildPid, # u32 pid
+    1)     # u16 type = F_RDLK / u16 whence = SEEK_SET
+
+for fd in (0, filefd, sockpairfd) :
+    mk('092_fcntl',
+        (fcntl, fd, f_dupfd, 0))
+for fd in (0, filefd, sockpairfd) :
+    # works for socket. verified manually
+    mk('092_fcntl',
+        (fcntl, fd, f_setown, Vec64(ChildPid)),
+        notest=True)
+for fd in (0, filefd, sockpairfd) :
+    # works for stdin and file.  verified manually
+    mk('092_fcntl',
+        (fcntl, fd, f_setlk, flock),
+        notest=True)
+
+# note: mmap needs extra padding arg!
+mprotect = 74
+mmap = 197
+addr = 0x100000
+map_fixed = 0x10
+map_anon = 0x1000
+neg1 = 0xffffffffffffffff
+mk('074_mprotect',
+    (mmap, addr, 4*4096, 7, map_fixed|map_anon, neg1, 0, 0),
+    (mprotect, addr, 2*4096, 1))
+
+mlock = 203
+mk('203_mlock',
+    (mmap, addr, 4*4096, 7, map_fixed|map_anon, neg1, 0, 0),
+    (mlock, addr, 2*4096))
+
+munlock = 204
+mk('203_munlock',
+    (mmap, addr, 4*4096, 7, map_fixed|map_anon, neg1, 0, 0),
+    (munlock, addr, 2*4096))
+
+minherit = 273
+MAP_INHERIT_NONE = 2
+mk('273_minherit',
+    (mmap, addr, 4*4096, 7, map_fixed|map_anon, neg1, 0, 0),
+    (minherit, addr, 2*4096, MAP_INHERIT_NONE))
+
+semget = 221
+ipc_private = 0
+ipc_creat = 01000
+mk('221_semget',
+    (semget, ipc_private, 5, ipc_creat | 0666))
+
+def mkSemBuf(num, op, flg) :
+    return struct.pack('@Hhh', num, op, flg)
+
+semop = 222
+semops = Vec64(mkSemBuf(0,1,0), mkSemBuf(1,1,0), mkSemBuf(2,1,0))
+mk('222_semop',
+    (semget, ipc_private, 5, ipc_creat | 0666),
+    (semop, 65536, semops, 3),
+    notest=True)
+
+# two of these only works for root.
+__sysctl = 202
+kern_maxproc = Vec32(1,6)
+mk('202___sysctl',
+    (__sysctl, kern_maxproc, sz, Alloc(4), Vec64(4), intptr(1309), 4),
+    notest=True)
+mk('202___sysctl',
+    (__sysctl, kern_maxproc, sz, 0, Vec64(4), intptr(1308), 4),
+    notest=True)
+mk('202___sysctl',
+    (__sysctl, kern_maxproc, sz, Alloc(4), Vec64(4), 0, 4))
