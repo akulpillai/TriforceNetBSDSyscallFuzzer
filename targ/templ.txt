@@ -6,7 +6,7 @@ TESTME 1 exit 0
 5 open fn 0 0666
 6 close fd
 7 compat_50_wait4 pid buf 0 buf
-# XXX 8 compat_43_ocreat fn fd
+8 compat_43_ocreat fn fd
 9 link fn fn
 10 unlink fn
 12 chdir fn
@@ -16,10 +16,10 @@ TESTME 14 compat_50_mknod fn 0060666 0x102
 TESTME 16 chown fn 1 1
 # ASLR messes this one up, but with the right arg it works
 SKIP 17 break 0xc685c101380
-# XXX 18 compat_20_getfsstat
-# XXX 19 compat_43_olseek
+# XXX 18 compat_20_getfsstat fd fn fd
+19 compat_43_olseek fd fd fd
 20 getpid
-# 21 mount - gen2
+# 21 compat_40_mount - gen2
 TESTME 22 unmount fn 0
 TESTME 23 setuid 1
 24 getuid
@@ -37,15 +37,18 @@ TESTME 26 ptrace 10 pid str 0
 35 fchflags fd 1
 36 sync
 TESTME 37 kill pid 2
-# XXX 38 compat_43_stat43
+# XXX 38 compat_43_stat43 fd fn fn
 39 getppid
+# XXX 40 compat_43_lstat43 fd fn fn
 41 dup fd
 42 pipe buf
 43 getegid
 44 profil buf sz 0 1
 45 ktrace fn 0 1 pid
+# driver crash
+# XXX 46 compat_13_sigaction13 fd fn fn
 47 getgid
-# XXX 48 compat 13 sigprocmask13
+# XXX 48 compat_13_sigprocmask13
 49 __getlogin buf sz
 TESTME 50 __setlogin "test"
 TESTME 51 acct {0;fn}
@@ -58,15 +61,14 @@ TESTME 58 readlink fn  buf sz
 TESTME 59 execve fn ["foo","bar"] ["FOO=1","BAR=2"]
 60 umask 0022
 TESTME 61 chroot fn
-# XXX 62 compat_43_fstat43
-# XXX 63 compat_43_ogetkerninfo
-# XXX 64 compat_43_ogetpagesize
+62 compat_43_fstat43 fd fn
+63 compat_43_ogetkerninfo fd fn fn fd
+64 compat_43_ogetpagesize
 # 65 msync - gen2
 66 vfork
-# XXX 69 sbrk
-# XXX 70 sstk
-# XXX 72 compat_43_ommap
-# XXX 72 vadvise
+# driver hangs
+# XXX 71 compat_43_ommap fn fd fd fd fd fd
+# XXX 72 vadvise fd
 73 munmap buf sz
 # 74 mprotect - gen2
 # 75 madvise - gen2
@@ -78,9 +80,11 @@ TESTME 80 setgroups 3 [1,2,3]
 82 setpgid pid pid
 83 compat_50_setitimer 0 [1,0,1,0]
 # XXX 84 compat_43_owait
-# XXX 85 compat_12_oswapon
+# driver crashes
+# XXX 85 compat_12_oswapon fd
 86 compat_50_getitimer 0 buf
-# XXX 87 compat_43_ogethostname
+# XXX 87 compat_43_ogethostname fn fd
+# XXX 88 compat_43_osethostname fd fn fd
 89 compat_43_getdtablesize
 90 dup2 fd 4
 # 92 fcntl - gen2
@@ -121,11 +125,13 @@ TESTME 140 compat_50_adjtime [1,0] buf
 # 148 compat_50_quotactl - SKIP for now, UFS only anyway, and we're not using UFS
 # 155 nfssvc
 TESTME 161 compat_30_getfh fn buf
-# XXX 162 compat_09_ogetdomainname
-# XXX 163 compat_09_osetdomainname
-# XXX 164 compat_09_uname
+# driver crashes
+# XXX 162 compat_09_ogetdomainname fn fd
+# XXX 163 compat_09_osetdomainname fn fd
+# XXX 164 compat_09_uname fn
 TESTME 165 sysarch 11 str
-# XXX 169 compat_10_semsys
+# excluded
+# XXX 169 compat_10_semsys fd fd fd fd fd
 # XXX 170 compat_10_omsgsys
 # XXX 171 compat_10_oshmsys
 # XXX 175 compat_30_ntp_gettime
@@ -133,15 +139,17 @@ TESTME 165 sysarch 11 str
 TESTME 181 setgid 1
 TESTME 182 setegid 1
 TESTME 183 seteuid 1
+# XXX 186 lfs_segclean fd fd
 # XXX 188 compat_12_stat12 fn buf
 # XXX 189 compat_12_fstat12 fd buf
 # XXX 190 compat_12_lstat12 fn buf
 191 pathconf fn 1
 192 fpathconf fd 1
-# XXX 193 getsocketopt2
+# driver crashes
+# XXX 193 getsocketopt2 fd fd fd fn fn
 194 getrlimit 0 buf
 195 setrlimit 0 [1000,1000]
-# XXX 196 compat_12_getdirentries
+# XXX 196 compat_12_getdirentries fd fn fd fn
 # 198 __syscall - skip
 # note: lseek has padding before off_t
 199 lseek fd 0 123 1
@@ -150,15 +158,14 @@ TESTME 183 seteuid 1
 # 202 __sysctl - gen2
 # 203 mlock - gen2
 # 204 munlock - gen2
-# XXX 205 undelete
+# XXX 205 undelete buf
 206 compat_50_futimes fd {0;[1600000000,0,1600000000,0]}
 207 getpgid pid
-# XXX redacted
+209 poll fn fd fd
 # 220 compat_14___semctl - gen2
 # 221 semget - gen2
 # 222 semop - gen2
-# 224 compat_14__msgctl
-# 225 msgget
+# 225 msgget fd fd
 # 226 msgsnd
 # 227 msgrcv
 # 228 shmat
@@ -168,32 +175,38 @@ TESTME 183 seteuid 1
 232 compat_50_clock_gettime 0 buf
 TESTME 233 compat_50_clock_settime 0 [1600000000,0]
 234 compat_50_clock_getres 0 buf
-# XXX 235 timer_create
+# XXX 235 timer_create fn fn fn
 # XXX 236 timer_delete
 # XXX 237 compat_50_timer_settime
 # XXX 238 compat_50_timer_gettime
 # XXX 239 timer_getoverrun
 240 nanosleep [1,0] buf
-# XXX 241 fdatasync
-# XXX 242 mlockall
-# XXX 243 munlockallmunlockall
-# XXX 247 _ksem_init
-# XXX 248 _ksem_open
-# XXX 250 _ksem_close
-# XXX 251 _ksem_post
-# XXX 252 _ksem_wait
-305 issetugid
-# XXX 402 aio_read
-# XXX 405 aio_write
-# XXX 406 lio_listio
+241 fdatasync fd
+242 mlockall fd
+243 munlockall
+# XXX 246 modctl fd fn
+247 _ksem_init fd fn
+# XXX 248 _ksem_open fn fd fd fn
+250 _ksem_close fd
+# XXX 251 _ksem_post fd
+# XXX 252 _ksem_wait fd
+# XXX 253 _ksem_trywait fd
+# XXX 254 _ksem_getvalue fd fn
+# XXX 255 _ksem_destroy fd
+# XXX 256 _ksem_timedwait fd fd
+# XXX 258 mq_close fd
+270 __posix_rename fn fn
+# XXX 271 swapctl fd fn fd
 272 compat_30_getdents fd buf sz
-# XXX 274 lchmod
+# XXX 273 minherit fd buf sz fd
+274 lchmod fn fd
 TESTME 275 lchown fn 1 2
-# XXX 276 compat_50_lutimes
+276 compat_50_lutimes fn [1600000000,0]
 # 277 __msync13 - gen2
 # XXX 278 compat_30___stat13
 # XXX 279 compat_30___fstat13
 # XXX 280 compat_30___lstat13
+# XXX 282 __vfork14
 289 preadv fd [buf,sz,buf,sz] 2 123
 290 pwritev fd [str,sz,str,sz] 2 123
 # 297 fchroot
@@ -201,8 +214,6 @@ TESTME 275 lchown fn 1 2
 # 299 compat_30_fhstat - gen2
 286 getsid pid
 # XXX 334 compat_60_sa_yield
-242 mlockall 1
-243 munlockall
 296 __getcwd buf sz
 # XXX 346 sched_setparam
 # XXX 347 sched_getparam

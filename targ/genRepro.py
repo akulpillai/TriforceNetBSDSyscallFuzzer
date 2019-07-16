@@ -32,7 +32,7 @@ def get_syscall_details(syscall_no) :
             else : 
                 return (len(l.split()) - 2, l.split()[1])
     else :
-        raise SysNotFoundError("Syscall not found :" + syscall_no)
+        raise SysNotFoundError("Syscall not found :" + str(syscall_no))
 
 def gen_syscall_stat(sys) :
     sys = sys.split()
