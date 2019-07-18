@@ -14,10 +14,6 @@ getSym() {
 PANIC=`getSym panic`
 LOGSTORE=0   #XXX for now
 
-#test -d inputs || mkdir inputs
-#test -f inputs/ex1 || ./gen.py
-make testAfl || exit 1
-
 ./testAfl $AFL/afl-qemu-system-trace \
     -s -L $AFL/qemu_mode/qemu/pc-bios \
     -m 128M -nographic -drive format=raw,file=privmem:${IMG} \

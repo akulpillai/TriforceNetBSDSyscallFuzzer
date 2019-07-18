@@ -6,5 +6,5 @@ testAfl : testAfl.o
 	$(CC) $(CFLAGS) -o $@ testAfl.o
 
 clean:
-	rm -f testAfl.o
+	rm -f testAfl.o testAfl
 
