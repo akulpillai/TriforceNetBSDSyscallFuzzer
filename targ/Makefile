@@ -10,11 +10,6 @@ driver: $(OBJS)
 argfd.c : argfd.c.tmpl numTempl.py
 	./numTempl.py < argfd.c.tmpl > argfd.c
 
-# gen happens on fuzzer box
-inputs : gen.py
-	test -d inputs || mkdir inputs
-	./gen.py
-
 clean:
-	rm -f $(OBJS) testAfl.o
+	rm -f $(OBJS) testAfl.o argfd.c
 

@@ -1,0 +1,6 @@
+#!/bin/sh
+
+mkdir inputs
+./gen.py
+./genTempl.py templ.txt
+./gen2.py
