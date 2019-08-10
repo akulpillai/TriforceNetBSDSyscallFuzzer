@@ -1,28 +1,33 @@
 PREFIX		?= /usr/pkg/triforcenetbsdsyscallfuzzer
-HOST_PATH	= $(PREFIX)/fuzzHost
-TARG_PATH	= $(PREFIX)/targ
 DOC_PATH	= $(PREFIX)/docs
 
-HOST_DIR = ./fuzzHost
-TARG_DIR = ./targ
+HOST_PROGS	= ./testAfl ./runFuzz
+TARG_PROGS	= ./genInputs ./genRepro ./driver
+TARG_PROGS	+= ./gen.py ./gen2.py ./genTempl.py
+TARG_PROGS	+= ./genRepro.py
+TARG_FILES	= ./templ.txt
 
-HOST_PROGS	= ./fuzzHost/testAfl ./fuzzHost/runFuzz
-TARG_PROGS	= ./targ/genInputs ./targ/genRepro ./targ/driver
-TARG_PROGS	+= ./targ/gen.py ./targ/gen2.py ./targ/genTempl.py
-TARG_FILES	= ./targ/templ.txt
+CFLAGS= -g -Wall
+OBJS= aflCall.o driver.o parse.o sysc.o argfd.o
 
-all: 
-	$(MAKE) -C $(HOST_DIR)
-	$(MAKE) -C $(TARG_DIR)
+all : testAfl driver
+
+testAfl : testAfl.o
+	$(CC) $(CFLAGS) -o $@ testAfl.o
+
+driver: $(OBJS)
+    $(CC) $(CFLAGS) -static -o $@ $(OBJS)
+
+argfd.c : argfd.c.tmpl numTempl.py
+    ./numTempl.py < argfd.c.tmpl > argfd.c
 
 clean:
-	$(MAKE) -C $(HOST_DIR) clean
-	$(MAKE) -C $(TARG_DIR) clean
+	rm -f testAfl.o testAfl
+	rm -f $(OBJS) testAfl.o argfd.c
 
 install: all
-	mkdir -p -m 755 $${DESTDIR}$(HOST_PATH) $${DESTDIR}$(TARG_PATH) $${DESTDIR}$(DOC_PATH)
-	install -m 755 $(HOST_PROGS) $${DESTDIR}$(HOST_PATH)
-	install -m 755 $(TARG_PROGS) $${DESTDIR}$(TARG_PATH)
-	install -m 644 $(TARG_FILES) $${DESTDIR}$(TARG_PATH)
+	install -m 755 $(HOST_PROGS) $${DESTDIR}
+	install -m 755 $(TARG_PROGS) $${DESTDIR}
+	install -m 644 $(TARG_FILES) $${DESTDIR}
 	install -m 644 ./docs/* $${DESTDIR}$(DOC_PATH)
 
