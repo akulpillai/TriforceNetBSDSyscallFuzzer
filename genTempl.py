@@ -81,7 +81,7 @@ def cross(xs) :
 def genArgs(gens) :
     return cross(genArg(g) for g in gens)
 
-TEST=1
+TEST=0
 
 def genCalls(nr, nm, args, notest) :
     #print nr, nm, args

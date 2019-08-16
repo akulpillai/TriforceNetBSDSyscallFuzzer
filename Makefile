@@ -30,4 +30,3 @@ install: all
 	install -m 755 $(TARG_PROGS) $${DESTDIR}
 	install -m 644 $(TARG_FILES) $${DESTDIR}
 	install -m 644 ./docs/* $${DESTDIR}$(DOC_PATH)
-
