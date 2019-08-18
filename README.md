@@ -4,12 +4,10 @@ using QEMU's full system emulation. TriforceNetBSDSyscallFuzzer
 will be a syscall fuzzer for NetBSD built on top of TriforceAFL.
 
 ## Building the target 
-On the NetBSD box , enter the `targ` directory and run `make`.
+On the NetBSD box , enter the Fuzzer directory and run `make`.
 You should also build input files from this directory
 ```
-    mkdir inputs
-    ./gen.py                   # build simple tests
-    ./genTempl.py templ.txt    # build most syscall tests
+    ./genInputs
 ```
 
 ## Building a test image
@@ -28,8 +26,8 @@ This can be done using the following commands:
 $ su
 # vnconfig vnd0 disk.bin
 # mount /dev/vnd0a /mnt
-# cp $FUZZER/targ/driver /mnt/bin
-# cp $FUZZER/targ/inputs/ex1 /mnt/etc
+# cp $FUZZER/driver /mnt/bin
+# cp $FUZZER/inputs/ex1 /mnt/etc
 # cat > /mnt/etc/boot.conf <<_EOF_
 stty com0 115200
 set tty com0
@@ -65,24 +63,27 @@ This configures the system to boot with a serial console, and
 to run the driver during the boot process (after making sure
 the root partition is writable).  After preparing the disk
 image, we downloaded it to our fuzzing host and executed it 
-with fuzzHost/runFuzz
+with runFuzz
 
-The fuzzHost/runFuzz attaches the disk.bin as our primary drive and boots
+The runFuzz attaches the disk.bin as our primary drive and boots
 from it.  It then uses testAfl to run through the inputs
 from `inputs/ex?`.
 
 ## Preparing the Host and Fuzzing
 We run the fuzzer on a NetBSD host.
 On the fuzzer host, install TriforceAFL from pkgsrc(wip/triforceafl).
-Copy the `disk*.bin` and kernel image / debugging symbols `netbsd.gdb` to the `fuzzhost` directory, 
-and move the inputs into the fuzzHost directory:
+Copy the `disk*.bin` and kernel image / debugging symbols `netbsd.gdb`
+ to the $FUZZER directory:
 
 ```
-    cd TriforceNetBSDSyscallFuzzer # this should now have the files disk.bin and netbsd.gdb
-    cp disk.bin fuzzHost/
-    cp netbsd.gdb fuzzHost/
-    cd fuzzhost
+    cp disk.bin $FUZZER/
+    cp netbsd.gdb $FUZZER/
     make
-    mv ../targ/inputs .
+```
+Since we are using an older version of QEMU, we need to disable 
+mprotect while fuzzing:
+```
+    sysctl -w security.pax.mprotect.enabled=0
+
 ```
 Start fuzzing using `./runFuzz -M -M0`

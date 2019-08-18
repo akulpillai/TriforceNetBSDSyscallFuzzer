@@ -12,7 +12,7 @@ def sockInAddr(host, port, sz=16, family=2) :
 def intptr(n) :
     return String(struct.pack('@I', n))
 
-TEST = 1
+TEST=0
 
 def nextFile(nm, indexes={}) :
     if nm not in indexes :
