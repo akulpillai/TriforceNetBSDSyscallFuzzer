@@ -16,10 +16,10 @@ testAfl : testAfl.o
 	$(CC) $(CFLAGS) -o $@ testAfl.o
 
 driver: $(OBJS)
-    $(CC) $(CFLAGS) -static -o $@ $(OBJS)
+	$(CC) $(CFLAGS) -static -o $@ $(OBJS)
 
 argfd.c : argfd.c.tmpl numTempl.py
-    ./numTempl.py < argfd.c.tmpl > argfd.c
+	./numTempl.py < argfd.c.tmpl > argfd.c
 
 clean:
 	rm -f testAfl.o testAfl
