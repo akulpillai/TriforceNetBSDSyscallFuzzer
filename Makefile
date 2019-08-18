@@ -26,6 +26,7 @@ clean:
 	rm -f $(OBJS) testAfl.o argfd.c
 
 install: all
+	mkdir -p -m 755 $${DESTDIR}$(DOC_PATH)
 	install -m 755 $(HOST_PROGS) $${DESTDIR}
 	install -m 755 $(TARG_PROGS) $${DESTDIR}
 	install -m 644 $(TARG_FILES) $${DESTDIR}
