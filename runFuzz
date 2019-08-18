@@ -41,9 +41,8 @@ LOGSTORE=0   #XXX for now
 export AFL_SKIP_CRASHES=1
 $AFL/afl-fuzz $FARGS -t 500+ -m 3000 -i $INP -o outputs -QQ -- \
     $AFL/afl-qemu-system-trace \
-    -L $AFL/qemu_mode/qemu/pc-bios \
+    -L $AFL/../share/pc-bios \
     -m 128M -nographic -drive format=raw,file=privmem:${IMG} \
     -aflPanicAddr "$PANIC" \
     -aflDmesgAddr "$LOGSTORE" \
     -aflFile @@
-
